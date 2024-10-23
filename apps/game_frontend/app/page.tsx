@@ -4,6 +4,8 @@ import useSocket from "./hooks/useSocket";
 import { Chess, Color, PieceSymbol, Square } from "chess.js";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { intialiseGame, makeMove } from "./helpers/SocketPayload";
+import { messages } from "@chess/types/messages";
 
 export default function Home() {
   const socket = useSocket();
@@ -16,13 +18,13 @@ export default function Home() {
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
       switch (message.type) {
-        case "init_game":
+        case String(messages.GAME_STARTED):
           setGameStarted(true);
           setBoard(chess?.board());
           setLoading(false);
           console.log("Game Started");
           break;
-        case "MOVE":
+        case String(messages.SHOW_MOVE):
           const move = message.payload;
           console.log("Move Made");
           chess?.move({
@@ -31,7 +33,7 @@ export default function Home() {
           });
           setBoard(chess?.board());
           break;
-        case "GAME_OVER":
+        case String(messages.SHOW_GAME_OVER):
           console.log("GAME OVER", message.payload);
           break;
         default:
@@ -41,12 +43,7 @@ export default function Home() {
   }, [socket]);
 
   const startGame = () => {
-    socket &&
-      socket.send(
-        JSON.stringify({
-          type: "init_game",
-        })
-      );
+    socket && socket.send(intialiseGame());
     setLoading(true);
   };
   if (!socket) return <div>Connecting To the server...</div>;
@@ -88,12 +85,7 @@ function ChessBoard({
     if (!socket) return;
     if (!move.from || !move.to) return;
     console.log("send");
-    socket.send(
-      JSON.stringify({
-        type: "move",
-        move,
-      })
-    );
+    socket.send(makeMove({ move }));
     setMove(initialMove);
   }, [socket, move]);
 

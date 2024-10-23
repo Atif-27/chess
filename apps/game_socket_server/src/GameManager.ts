@@ -1,5 +1,7 @@
 import WebSocket from "ws";
 import Game from "./Game";
+import { TgameMove } from "@chess/types/types";
+import { messages } from "@chess/types/messages";
 
 class GameManager {
   private games: Game[];
@@ -21,15 +23,16 @@ class GameManager {
   }
   removeUser(socket: WebSocket) {
     this.users.filter((user) => user !== socket);
-    // Show game results as user disconnected
+    //TODO Show game results as user disconnected
   }
   addHandler(socket: WebSocket) {
+    // Server is basically Listening for any message from client
     socket.on("message", (data) => {
       const message = JSON.parse(data.toString());
-      if (message.type === "init_game") {
+      if (message.type === messages.INIT_GAME) {
         this.initGame(socket);
       }
-      if (message.type === "move") {
+      if (message.type === messages.MAKE_MOVE) {
         this.moveInGame(socket, message.move);
       }
     });
@@ -43,13 +46,7 @@ class GameManager {
       this.pending = socket;
     }
   }
-  moveInGame(
-    socket: WebSocket,
-    move: {
-      to: string;
-      from: string;
-    }
-  ) {
+  moveInGame(socket: WebSocket, move: TgameMove) {
     const game = this.games.find(
       (game) => game.player1 === socket || game.player2 === socket
     );
