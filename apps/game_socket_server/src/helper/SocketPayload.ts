@@ -1,16 +1,45 @@
 import { Square } from "chess.js";
 import { TgameMove } from "@chess/types/types";
 import { messages } from "@chess/types/messages";
-
-export function gameStarted({ color }: { color: string }) {
+import Game from "../Game";
+import { User } from "../UserManager";
+export function gameCreated({ gameId }: { gameId: string }) {
   return JSON.stringify({
-    type: messages.GAME_STARTED,
+    type: messages.GAME_CREATED,
     payload: {
-      color,
+      message: "Game Created",
+      gameId,
     },
   });
 }
-
+export function showGameCreated({
+  game,
+  whitePlayer,
+  blackPlayer,
+}: {
+  game: Game;
+  whitePlayer: User;
+  blackPlayer: User;
+}) {
+  return JSON.stringify({
+    type: messages.SHOW_GAME_CREATED,
+    payload: {
+      gameId: game.gameId,
+      board: game.board,
+      startTime: game.startTime,
+      whitePlayer: {
+        id: whitePlayer.userId,
+        name: whitePlayer.username,
+        isGuest: whitePlayer.isGuest,
+      },
+      blackPlayer: {
+        id: blackPlayer.userId,
+        name: blackPlayer.username,
+        isGuest: blackPlayer.isGuest,
+      },
+    },
+  });
+}
 export function showMove({ move }: { move: TgameMove }) {
   return JSON.stringify({ type: messages.SHOW_MOVE, payload: move });
 }

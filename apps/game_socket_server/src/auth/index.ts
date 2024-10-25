@@ -1,4 +1,4 @@
-import { User } from "../SocketManager";
+import { User } from "../UserManager";
 import { WebSocket } from "ws";
 
 export interface userJwtClaims {
