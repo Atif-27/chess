@@ -19,17 +19,29 @@ model User{
   email String?
   rating Int @default(1200)
   password String
-
-  // provider      AuthProvider
-  // gamesAsWhite  Game[]   @relation("GamesAsWhite")
-  // gamesAsBlack  Game[]   @relation("GamesAsBlack")
-
   createdAt DateTime @default(now())
-  lastLogin DateTime?
-
-  //   @@index([rating])
+  gamesAsWhite  Game[]   @relation("GamesAsWhite")
+  gamesAsBlack  Game[]   @relation("GamesAsBlack")
+  @@index([rating])
 }
 
 model Game{
+  id String @id @default(uuid())
+  whitePlayerId String 
+  blackPlayerId String
+  whitePlayer   User       @relation("GamesAsWhite", fields: [whitePlayerId], references: [id])
+  blackPlayer   User       @relation("GamesAsBlack", fields: [blackPlayerId], references: [id])
+  status GameStatus
+  result GameStatus
+}
 
+enum GameStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABONDNED
+}
+enum GameResult {
+  WHITE_WINS
+  BLACK_WINS
+  DRAW
 }
