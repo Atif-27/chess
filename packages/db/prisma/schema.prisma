@@ -1,47 +1,69 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+  // This is your Prisma schema file,
+  // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+  // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+  // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-generator client {
-  provider = "prisma-client-js"
-}
+  generator client {
+    provider = "prisma-client-js"
+  }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-model User{
-  id  String @id @default(uuid())
-  username String @unique
-  name String
-  email String?
-  rating Int @default(1200)
-  password String
-  createdAt DateTime @default(now())
-  gamesAsWhite  Game[]   @relation("GamesAsWhite")
-  gamesAsBlack  Game[]   @relation("GamesAsBlack")
-  @@index([rating])
-}
+  datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+  }
+  model User{
+    id  String @id @default(uuid())
+    username String @unique
+    name String
+    email String?
+    rating Int @default(1200)
+    password String
+    createdAt DateTime @default(now())
+    gamesAsWhite  Game[]   @relation("GamesAsWhite")
+    gamesAsBlack  Game[]   @relation("GamesAsBlack")
+    @@index([rating])
+  }
 
-model Game{
-  id String @id @default(uuid())
-  whitePlayerId String 
-  blackPlayerId String
-  whitePlayer   User       @relation("GamesAsWhite", fields: [whitePlayerId], references: [id])
-  blackPlayer   User       @relation("GamesAsBlack", fields: [blackPlayerId], references: [id])
-  status GameStatus
-  result GameStatus
-}
-
-enum GameStatus {
-  IN_PROGRESS
-  COMPLETED
-  ABONDNED
-}
-enum GameResult {
-  WHITE_WINS
-  BLACK_WINS
-  DRAW
+  model Game{
+    id String @id @default(uuid())
+    whitePlayerId String 
+    blackPlayerId String
+    whitePlayer   User       @relation("GamesAsWhite", fields: [whitePlayerId], references: [id])
+    blackPlayer   User       @relation("GamesAsBlack", fields: [blackPlayerId], references: [id])
+    chessBoard     String       @default("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") 
+    status GameStatus @default(IN_PROGRESS)
+    result GameResult @default(IN_PROGRESS)
+    moves Move[] 
+  }
+  model Move{
+    id          String   @id @default(uuid())
+    gameId      String
+    game        Game     @relation(fields: [gameId], references: [id])
+    to          String
+    from        String
+    piece       String
+    promotion   String? 
+    moveNumber  Int
+    before      String
+    after       String
+    createdAt   DateTime @default(now())
+    @@index([gameId])
+  }
+  enum GameStatus {
+    IN_PROGRESS
+    COMPLETED
+    ABONDNED
+  }
+  enum GameResult {
+    IN_PROGRESS
+    WHITE_WINS
+    BLACK_WINS
+    DRAW
+  }
+enum AuthProvider {
+  EMAIL
+  GOOGLE
+  GITHUB
+  GUEST
 }
