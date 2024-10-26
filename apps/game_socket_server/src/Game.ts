@@ -7,7 +7,9 @@ import {
 } from "./helper/SocketPayload";
 import { TgameMove } from "@chess/types/types";
 import prisma from "@chess/db/client";
-import { User } from "./UserManager";
+import { User, UserManager } from "./UserManager";
+
+const userManager = UserManager.createUserManager();
 
 export default class Game {
   public gameId: string;
@@ -24,54 +26,6 @@ export default class Game {
     this.startTime = new Date();
     console.log("Game Created");
     this.createGameInDB(); // Create Game in DB and get the gameId
-  }
-  // public makeMove(socket: WebSocket, move: TgameMove) {
-  //   //TODO: validation here with zod
-  //   //TODO: Also send checkmate or not
-  //   // ! Check Users Turn
-  //   const currentTurn = this.board.turn();
-  //   if (currentTurn === "w" && socket !== this.player1) return;
-  //   if (currentTurn === "b" && socket !== this.player2) return;
-
-  //   //! Update  Board
-  //   try {
-  //     this.board.move({
-  //       from: move.from as string,
-  //       to: move.to as string,
-  //       promotion: "q",
-  //     });
-  //   } catch (error) {
-  //     console.error("Move Error:", error);
-  //     return;
-  //   }
-  //   //! Check if game over
-  //   if (this.board.isGameOver()) {
-  //     console.log("CheckMate bro");
-  //     const winner = this.board.turn() === "w" ? "black" : "white";
-  //     //TODO Also Show return the move if rest of the code doesnt work
-  //     this.player1.send(showGameOver({ winner }));
-  //     this.player2.send(showGameOver({ winner }));
-  //     return;
-  //   }
-
-  //   //! send updated to both player
-  //   this.player1.send(showMove({ move }));
-  //   this.player2.send(showMove({ move }));
-
-  //   console.log("Move Made");
-  // }
-  async createGameInDB() {
-    const game = await prisma.game.create({
-      data: {
-        whitePlayer: {
-          connect: { id: this.whitePlayerId },
-        },
-        blackPlayer: {
-          connect: { id: this.blackPlayerId },
-        },
-      },
-    });
-    this.gameId = game.id;
   }
   public showGameCreated(users: User[]) {
     const whitePlayer = users?.find(
@@ -91,5 +45,50 @@ export default class Game {
       );
     });
   }
+  async createGameInDB() {
+    const game = await prisma.game.create({
+      data: {
+        whitePlayer: {
+          connect: { id: this.whitePlayerId },
+        },
+        blackPlayer: {
+          connect: { id: this.blackPlayerId },
+        },
+      },
+    });
+    this.gameId = game.id;
+  }
+  public makeMove(user: User, move: TgameMove) {
+    //TODO: validation here with zod
+    //TODO: Also send checkmate or not
+    // ! Check Users Turn
+    const currentTurn = this.board.turn();
+    if (currentTurn === "w" && user.userId !== this.whitePlayerId) return;
+    if (currentTurn === "b" && user.userId !== this.blackPlayerId) return;
+
+    //! Update  Board
+    try {
+      this.board.move({
+        from: move.from as string,
+        to: move.to as string,
+        promotion: "q",
+      });
+    } catch (error) {
+      console.error("Move Error:", error);
+      return;
+    }
+    //! Check if game over
+    if (this.board.isGameOver()) {
+      console.log("CheckMate bro");
+      const winner = this.board.turn() === "w" ? "black" : "white";
+      //TODO Also Show return the move if rest of the code doesnt work
+      userManager.broadcastMessage(this.gameId, showGameOver({ winner }));
+      return;
+    }
+    //! send updated to both player
+    userManager.broadcastMessage(this.gameId, showMove({ move }));
+    console.log("Move Made");
+  }
+  async updateGameInDB() {}
 }
 

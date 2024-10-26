@@ -3,21 +3,18 @@ import Game from "./Game";
 import { TgameMove } from "@chess/types/types";
 import { messages } from "@chess/types/messages";
 import PrismaClient from "@chess/db/client";
-import { User } from "./UserManager";
+import { User, UserManager } from "./UserManager";
 import { gameCreated, showGameCreated } from "./helper/SocketPayload";
 
+const userManafger = UserManager.createUserManager();
 class GameManager {
   private games: Game[];
   private users: User[];
-  private usersInRoom: Map<string, User[]>;
-  private userRoomMapping: Map<string, string>;
   private pendingUser: User | null;
   private static instance: GameManager;
   private constructor() {
     this.games = [];
     this.users = [];
-    this.usersInRoom = new Map<string, User[]>();
-    this.userRoomMapping = new Map<string, string>();
     this.pendingUser = null;
   }
   static createGameManager(): GameManager {
@@ -38,16 +35,6 @@ class GameManager {
     this.users = this.users.filter((user) => user.socket !== socket);
     // socketManager.removeUser(user);
     //TODO Show game results as user disconnected
-  }
-  broadcastMessage(room: string, message: string) {
-    const users = this.usersInRoom.get(room);
-    if (!users) {
-      console.error("No users in room");
-      return;
-    }
-    users?.forEach((user) => {
-      user.socket.send(message);
-    });
   }
   addHandler(user: User) {
     //! Server is basically Listening for any message from client
@@ -73,18 +60,15 @@ class GameManager {
       const newGame = new Game(pendingUser.userId, user.userId);
       this.games.push(newGame);
       this.pendingUser = null;
-      this.usersInRoom.set(newGame.gameId, [pendingUser, user]);
-      this.broadcastMessage(
+      userManafger.addUserToRoom([pendingUser, user], newGame.gameId);
+      userManafger.broadcastMessage(
         newGame.gameId,
         gameCreated({ gameId: newGame.gameId })
       );
     }
-    //TODO: Emiting to client that Game Started
-    // this.player1.send(gameStarted({ color: "white" }));
-    // this.player2.send(gameStarted({ color: "black" }));
   }
   showGameCreated(gameId: string) {
-    const users = this.usersInRoom.get(gameId);
+    const users = userManafger.getUsersInRoom(gameId);
     const game = this.games.find((game) => game.gameId === gameId);
     if (!users || !game) {
       console.error("No users or game found");
@@ -92,12 +76,10 @@ class GameManager {
     }
     game?.showGameCreated(users);
   }
-  // moveInGame(socket: WebSocket, move: TgameMove) {
-  //   const game = this.games.find(
-  //     (game) => game.player1 === socket || game.player2 === socket
-  //   );
-  //   game?.makeMove(socket, move);
-  // }
+  moveInGame(user: User, move: TgameMove, gameId: string) {
+    const game = this.games.find((game) => game.gameId === gameId);
+    game?.makeMove(user, move);
+  }
 }
 
 export default GameManager;
