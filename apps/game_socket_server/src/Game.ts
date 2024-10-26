@@ -25,7 +25,7 @@ export default class Game {
     this.board = new Chess();
     this.startTime = new Date();
     console.log("Game Created");
-    this.createGameInDB(); // Create Game in DB and get the gameId
+    this.createGameInDB();
   }
   public showGameCreated(users: User[]) {
     const whitePlayer = users?.find(

@@ -7,7 +7,7 @@ const gameManager = GameManager.createGameManager();
 console.log("WebSocket Server is listening to Port 8080");
 
 wss.on("connection", function connection(ws) {
-  const token = "";
+  const token = "dsfsdfsdfdsfdfsdfsdf";
   const user = extractUserInfo(ws, token);
   gameManager.addUser(user);
   ws.on("disconnect", () => {
