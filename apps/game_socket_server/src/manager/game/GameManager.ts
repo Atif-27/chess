@@ -3,8 +3,9 @@ import Game from "./Game";
 import { TgameMove } from "@chess/types/types";
 import { messages } from "@chess/types/messages";
 import PrismaClient from "@chess/db/client";
-import { User, UserManager } from "./UserManager";
-import { gameCreated, showGameCreated } from "./helper/SocketPayload";
+import { UserManager } from "../user/UserManager";
+import { User } from "../user/user";
+import { gameCreated, showGameCreated } from "../../helper/SocketPayload";
 
 const userManafger = UserManager.createUserManager();
 class GameManager {

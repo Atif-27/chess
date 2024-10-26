@@ -4,10 +4,10 @@ import {
   showGameCreated,
   showGameOver,
   showMove,
-} from "./helper/SocketPayload";
+} from "../../helper/SocketPayload";
 import { TgameMove } from "@chess/types/types";
 import prisma from "@chess/db/client";
-import { User, UserManager } from "./UserManager";
+import { User, UserManager } from "../user/UserManager";
 
 const userManager = UserManager.createUserManager();
 
@@ -89,6 +89,22 @@ export default class Game {
     userManager.broadcastMessage(this.gameId, showMove({ move }));
     console.log("Move Made");
   }
-  async updateGameInDB() {}
+  async updateGameInDB() {
+    // const game = await prisma.game.update({
+    //   where: { id: this.gameId },
+    //   data: {
+    //     chessBoard: this.board.fen(),
+    //   },
+    // });
+    // const moves = await prisma.move.create({
+    //   data: {
+    //     game: {
+    //       connect: { id: this.gameId },
+    //     },
+    //     to: "e4",
+    //     from: "e5",
+    //     piece: "pawn",
+    //   },
+    // });
+  }
 }
-

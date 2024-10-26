@@ -1,5 +1,5 @@
-import { User } from "../UserManager";
 import { WebSocket } from "ws";
+import { User } from "../manager/user/user";
 
 export interface userJwtClaims {
   userId: string;
