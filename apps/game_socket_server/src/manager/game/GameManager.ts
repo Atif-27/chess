@@ -45,7 +45,7 @@ class GameManager {
         this.initGame(user);
       }
       if (message.type === messages.MAKE_MOVE) {
-        // this.moveInGame(user.socket, message.move);
+        this.moveInGame(user, message.payload.move, message.payload.gameId);
       }
       if (message.type === messages.SHOW_GAME_CREATED) {
         this.showGameCreated(message.payload.gameId);

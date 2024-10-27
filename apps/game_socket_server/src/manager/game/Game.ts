@@ -5,9 +5,11 @@ import {
   showGameOver,
   showMove,
 } from "../../helper/SocketPayload";
+import { randomUUID } from "crypto";
 import { TgameMove } from "@chess/types/types";
 import prisma from "@chess/db/client";
-import { User, UserManager } from "../user/UserManager";
+import { UserManager } from "../user/UserManager";
+import { User } from "../user/user";
 
 const userManager = UserManager.createUserManager();
 
@@ -19,7 +21,7 @@ export default class Game {
   public startTime: Date;
 
   constructor(whitePlayerId: string, blackPlayerId: string) {
-    this.gameId = ""; // GameId is the id of the game in the database
+    this.gameId = randomUUID();
     this.whitePlayerId = whitePlayerId;
     this.blackPlayerId = blackPlayerId;
     this.board = new Chess();
@@ -48,6 +50,7 @@ export default class Game {
   async createGameInDB() {
     const game = await prisma.game.create({
       data: {
+        id: this.gameId,
         whitePlayer: {
           connect: { id: this.whitePlayerId },
         },
@@ -56,13 +59,13 @@ export default class Game {
         },
       },
     });
-    this.gameId = game.id;
   }
   public makeMove(user: User, move: TgameMove) {
     //TODO: validation here with zod
     //TODO: Also send checkmate or not
     // ! Check Users Turn
     const currentTurn = this.board.turn();
+    console.log("Current Turn:", currentTurn);
     if (currentTurn === "w" && user.userId !== this.whitePlayerId) return;
     if (currentTurn === "b" && user.userId !== this.blackPlayerId) return;
 

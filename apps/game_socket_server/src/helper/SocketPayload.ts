@@ -2,7 +2,7 @@ import { Square } from "chess.js";
 import { TgameMove } from "@chess/types/types";
 import { messages } from "@chess/types/messages";
 import Game from "../manager/game/Game";
-import { User } from "../manager/user/UserManager";
+import { User } from "../manager/user/user";
 export function gameCreated({ gameId }: { gameId: string }) {
   return JSON.stringify({
     type: messages.GAME_CREATED,
