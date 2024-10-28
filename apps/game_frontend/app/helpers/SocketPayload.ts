@@ -7,9 +7,18 @@ export function intialiseGame() {
   });
 }
 
-export function makeMove({ move }: { move: TgameMove }) {
+export function makeMove({
+  move,
+  gameId,
+}: {
+  move: TgameMove;
+  gameId: string;
+}) {
   return JSON.stringify({
     type: messages.MAKE_MOVE,
-    move,
+    payload: {
+      move,
+      gameId,
+    },
   });
 }
