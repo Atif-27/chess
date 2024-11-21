@@ -2,41 +2,50 @@
 import { messages } from "@chess/types/messages";
 import Image from "next/image";
 import { Chess, Color, PieceSymbol, Square } from "chess.js";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState ,useCallback} from "react";
 import { useSocketContext } from "../../../../context/SocketProvider";
 import { makeMove } from "../../../../helpers/SocketPayload";
 
-export default function page({
+
+
+export default function Page({
   params,
 }: {
-  params: {
-    gameId: string;
-  };
+  params: { gameId: string };
 }) {
   const { socket } = useSocketContext();
-  const [chess, setChess] = useState<Chess | null>(new Chess());
-  const [board, setBoard] = useState(chess?.board());
-  const [loading, setLoading] = useState(false);
+  const [chess, setChess] = useState<Chess | null>(null);
+  const [board, setBoard] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [gameData, setGameData] = useState<any>(null);
+
   const { gameId } = params;
-  const [gameData, setGameData] = useState(null);
+
+  const updateBoard = useCallback((newChess: Chess) => {
+    setChess(newChess);
+    setBoard(newChess.board());
+  }, []);
+
   useEffect(() => {
     if (!socket) return;
-    socket.onmessage = (event) => {
+    const handleMessage = (event: MessageEvent) => {
       const message = JSON.parse(event.data);
+
       switch (message.type) {
         case String(messages.SHOW_GAME_CREATED):
-          console.log("game is", message.payload);
+          console.log("Game is", message.payload.currentFen);
           setGameData(message.payload);
+          const newChess = new Chess(message.payload.currentFen);
+          updateBoard(newChess);
           setLoading(false);
           break;
         case String(messages.SHOW_MOVE):
           const move = message.payload;
           console.log("Move Made");
-          chess?.move({
-            ...move,
-            promotion: "q",
-          });
-          setBoard(chess?.board());
+          if (chess) {
+            chess.move({ ...move, promotion: "q" });
+            updateBoard(chess);
+          }
           break;
         case String(messages.SHOW_GAME_OVER):
           console.log("GAME OVER", message.payload);
@@ -45,25 +54,36 @@ export default function page({
           break;
       }
     };
-  }, [socket]);
+
+    socket.onmessage = handleMessage;
+
+    return () => {
+      socket.onmessage = null;
+    };
+  }, [socket, chess, updateBoard]);
 
   useEffect(() => {
-    setLoading(true);
-    socket?.send(
-      JSON.stringify({
-        type: messages.SHOW_GAME_CREATED,
-        payload: { gameId: gameId },
-      })
-    );
+    if (gameId && socket) {
+      setLoading(true);
+      socket.send(
+        JSON.stringify({
+          type: messages.SHOW_GAME_CREATED,
+          payload: { gameId },
+        })
+      );
+    }
   }, [gameId, socket]);
-  if (!socket) return <div>Connecting To the server...</div>;
+
+  if (!socket) return <div>Connecting to the server...</div>;
   if (loading) return <div className="animate-pulse">Loading Game...</div>;
+
   return (
     <div>
       <ChessBoard board={board} socket={socket} gameData={gameData} />
     </div>
   );
 }
+
 
 interface Imove {
   from: Square | null;
