@@ -12,7 +12,7 @@ export function gameCreated({ gameId }: { gameId: string }) {
     },
   });
 }
-export function showGameCreated({
+export function showCreatedGame({
   game,
   whitePlayer,
   blackPlayer,

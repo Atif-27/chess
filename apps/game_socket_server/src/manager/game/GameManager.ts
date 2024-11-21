@@ -5,9 +5,9 @@ import { messages } from "@chess/types/messages";
 import PrismaClient from "@chess/db/client";
 import { UserManager } from "../user/UserManager";
 import { User } from "../user/user";
-import { gameCreated, showGameCreated } from "../../helper/SocketPayload";
+import { gameCreated } from "../../helper/SocketPayload";
 
-const userManafger = UserManager.createUserManager();
+const userManager = UserManager.createUserManager();
 class GameManager {
   private games: Game[];
   private users: User[];
@@ -23,6 +23,7 @@ class GameManager {
     return GameManager.instance;
   }
   addUser(user: User) {
+    userManager.updateUserSocket(user.userId, user.socket);
     this.users.push(user);
     this.addHandler(user);
     console.log("User Added and Listening for Messages");
@@ -48,7 +49,7 @@ class GameManager {
         this.moveInGame(user, message.payload.move, message.payload.gameId);
       }
       if (message.type === messages.SHOW_GAME_CREATED) {
-        this.showGameCreated(message.payload.gameId);
+        this.createdGame(message.payload.gameId);
       }
     });
   }
@@ -61,15 +62,15 @@ class GameManager {
       const newGame = new Game(pendingUser.userId, user.userId);
       this.games.push(newGame);
       this.pendingUser = null;
-      userManafger.addUserToRoom([pendingUser, user], newGame.gameId);
-      userManafger.broadcastMessage(
+      userManager.addUserToRoom([pendingUser, user], newGame.gameId);
+      userManager.broadcastMessage(
         newGame.gameId,
         gameCreated({ gameId: newGame.gameId })
       );
     }
   }
-  showGameCreated(gameId: string) {
-    const users = userManafger.getUsersInRoom(gameId);
+  createdGame(gameId: string) {
+    const users = userManager.getUsersInRoom(gameId);
     const game = this.games.find((game) => game.gameId === gameId);
     if (!users || !game) {
       console.error("No users or game found");

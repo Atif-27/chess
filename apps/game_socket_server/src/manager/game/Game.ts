@@ -1,7 +1,7 @@
 import WebSocket from "ws";
 import { Chess } from "chess.js";
 import {
-  showGameCreated,
+  showCreatedGame,
   showGameOver,
   showMove,
 } from "../../helper/SocketPayload";
@@ -43,7 +43,7 @@ export default class Game {
     }
     users?.forEach((user) => {
       user.socket.send(
-        showGameCreated({ game: this, whitePlayer, blackPlayer })
+        showCreatedGame({ game: this, whitePlayer, blackPlayer })
       );
     });
   }
