@@ -16,10 +16,12 @@ export function showCreatedGame({
   game,
   whitePlayer,
   blackPlayer,
+  currentFen
 }: {
   game: Game;
   whitePlayer: User;
   blackPlayer: User;
+  currentFen: string;
 }) {
   return JSON.stringify({
     type: messages.SHOW_GAME_CREATED,
@@ -37,6 +39,7 @@ export function showCreatedGame({
         name: blackPlayer.username,
         isGuest: blackPlayer.isGuest,
       },
+      currentFen,
     },
   });
 }

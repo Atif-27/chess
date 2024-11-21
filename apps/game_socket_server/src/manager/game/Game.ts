@@ -41,9 +41,10 @@ export default class Game {
       console.error("No users found");
       return;
     }
+
     users?.forEach((user) => {
       user.socket.send(
-        showCreatedGame({ game: this, whitePlayer, blackPlayer })
+        showCreatedGame({ game: this, whitePlayer, blackPlayer, currentFen: this.board.fen() })
       );
     });
   }

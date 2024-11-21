@@ -31,7 +31,7 @@
     blackPlayerId String
     whitePlayer   User       @relation("GamesAsWhite", fields: [whitePlayerId], references: [id])
     blackPlayer   User       @relation("GamesAsBlack", fields: [blackPlayerId], references: [id])
-    chessBoard     String       @default("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") 
+    currentFen     String       @default("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") 
     status GameStatus @default(IN_PROGRESS)
     result GameResult @default(IN_PROGRESS)
     moves Move[] 
