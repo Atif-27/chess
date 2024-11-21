@@ -2,23 +2,18 @@
 import { messages } from "@chess/types/messages";
 import Image from "next/image";
 import { Chess, Color, PieceSymbol, Square } from "chess.js";
-import React, { useEffect, useState ,useCallback} from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useSocketContext } from "../../../../context/SocketProvider";
 import { makeMove } from "../../../../helpers/SocketPayload";
+import { useUserContext } from "../../../../context/UserProvider";
 
-
-
-export default function Page({
-  params,
-}: {
-  params: { gameId: string };
-}) {
+export default function Page({ params }: { params: { gameId: string } }) {
   const { socket } = useSocketContext();
   const [chess, setChess] = useState<Chess | null>(null);
   const [board, setBoard] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [gameData, setGameData] = useState<any>(null);
-
+  const {user}= useUserContext();
   const { gameId } = params;
 
   const updateBoard = useCallback((newChess: Chess) => {
@@ -33,7 +28,7 @@ export default function Page({
 
       switch (message.type) {
         case String(messages.SHOW_GAME_CREATED):
-          console.log("Game is", message.payload.currentFen);
+          console.log("Game is", message.payload);
           setGameData(message.payload);
           const newChess = new Chess(message.payload.currentFen);
           updateBoard(newChess);
@@ -76,14 +71,31 @@ export default function Page({
 
   if (!socket) return <div>Connecting to the server...</div>;
   if (loading) return <div className="animate-pulse">Loading Game...</div>;
-
+  console.log(user);
+  const isWhite = gameData.whitePlayer.id === user?.id;
+  const isBlack = gameData.blackPlayer.id === user?.id;
   return (
     <div>
-      <ChessBoard board={board} socket={socket} gameData={gameData} />
+      {gameData && (
+        <div>
+          <div
+          className={`${isWhite ? "border border-green-400 text-green-400" : "text-white"}  p-2`}
+          >White Player: {gameData?.whitePlayer?.name}</div>
+          <div
+          className={`${isBlack ? "border border-green-400 text-green-400" : "text-white"}  p-2`}
+          >Black Player: {gameData?.blackPlayer?.name}</div>
+          <div>Game Started At: {
+            new Date(gameData?.startTime).toLocaleString()
+            }</div>
+        </div>
+      )}
+      <div >
+      <ChessBoard isBlack={isBlack} board={board} socket={socket} gameData={gameData} />
+
+      </div>
     </div>
   );
 }
-
 
 interface Imove {
   from: Square | null;
@@ -97,12 +109,14 @@ function ChessBoard({
   board,
   socket,
   gameData,
+  isBlack
 }: {
   board:
     | ({ square: Square; type: PieceSymbol; color: Color } | null)[][]
     | undefined;
   socket: WebSocket;
   gameData: any;
+  isBlack:boolean;
 }) {
   const [move, setMove] = useState<Imove>(initialMove);
   useEffect(() => {
@@ -113,10 +127,13 @@ function ChessBoard({
     socket.send(makeMove({ move, gameId: gameData.gameId }));
     setMove(initialMove);
   }, [socket, move]);
-
+  const correctBoard =isBlack ?
+  board?.slice().reverse().map((row) => row.slice().reverse()) :
+  board;
+  
   return (
     <div className="mx-auto w-screen min-h-screen flex flex-col bg-grey-600 p-10">
-      {board?.map((row, rindex) => {
+      {correctBoard?.map((row, rindex) => {
         return (
           <div key={rindex} className="flex">
             {row.map((col, cindex) => {

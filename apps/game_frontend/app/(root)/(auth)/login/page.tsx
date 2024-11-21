@@ -1,11 +1,13 @@
 "use client";
 import React from "react";
+import { useUserContext } from "../../../context/UserProvider";
 
 const page = () => {
   const [loginInput, setLoginInput] = React.useState({
     username: "",
     password: "",
   });
+  const {setUserCtx}=useUserContext();
   const handleLoginInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLoginInput({
       ...loginInput,
@@ -23,7 +25,8 @@ const page = () => {
             credentials: "include",
           });
           const data = await response.json();
-          console.log(data);
+          console.log(data.user);
+          setUserCtx(data.user);
     } catch (error) {
         console.log(error);
     }
