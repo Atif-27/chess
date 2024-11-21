@@ -7,11 +7,11 @@ class User {
   public userId: string;
   public conId: string;
   public isGuest?: boolean;
-  constructor(socket: WebSocket, JwtClaims: userJwtClaims, isGuest: boolean) {
+  constructor(socket: WebSocket, jwtDecoded: userJwtClaims, isGuest: boolean) {
     this.socket = socket;
     this.conId = crypto.randomBytes(16).toString("hex");
-    this.userId = isGuest ? this.conId : JwtClaims.userId;
-    this.username = isGuest ? `Guest${this.userId}` : JwtClaims.username;
+    this.userId = isGuest ? this.conId : jwtDecoded.userId;
+    this.username = isGuest ? `Guest${this.userId}` : jwtDecoded.username;
     this.isGuest = isGuest;
   }
 }

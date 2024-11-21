@@ -3,17 +3,22 @@ import prisma from '@chess/db/client';
 import bcrypt from 'bcrypt';
 import jsonwebtoken from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import cors from 'cors';
+
+
 dotenv.config();
+
 const app=express();
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
-
+app.use(cors({
+    origin:process.env.FRONTEND_URL,
+    credentials:true
+}));
 
 interface User{
+    id:string;
     username:string;
-    name:string;
-    email:string;
-    password?:string;
 }
 
 app.post('/api/v1/register',async (req,res)=>{
@@ -62,6 +67,7 @@ app.post('/api/v1/register',async (req,res)=>{
 
 app.post('/api/v1/login',async (req,res)=>{
     let {username,password}=req.body;
+    
     try {
         const user=await prisma.user.findFirst({
             where:{
@@ -90,8 +96,8 @@ app.post('/api/v1/login',async (req,res)=>{
     }
 }
 );
-const generateToken=(user:any)=>{
-    return jsonwebtoken.sign({id:user.id,username:user.username,email:user.email}, process.env.JWT_SECRET || "secret", {
+const generateToken=(user:User)=>{
+    return jsonwebtoken.sign({userId:user.id,username:user.username}, process.env.JWT_SECRET as string, {
         expiresIn: '1h'
     });
 }

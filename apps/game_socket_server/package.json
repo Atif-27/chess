@@ -11,9 +11,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@chess/types": "*",
     "chess.js": "^1.0.0-beta.8",
-    "ws": "^8.18.0",
-    "@chess/types": "*"
+    "cookie": "^1.0.2",
+    "jsonwebtoken": "^9.0.2",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/ws": "^8.5.12",
