@@ -14,12 +14,17 @@
   "description": "",
   "dependencies": {
     "@chess/types": "*",
+    "@prisma/client": "^6.3.1",
     "chess.js": "^1.0.0-beta.8",
     "cookie": "^1.0.2",
+    "dotenv": "^16.4.7",
     "jsonwebtoken": "^9.0.2",
     "ws": "^8.18.0"
   },
   "devDependencies": {
+    "@types/dotenv": "^6.1.1",
+    "@types/jsonwebtoken": "^9.0.8",
+    "@types/node": "^22.13.1",
     "@types/ws": "^8.5.12",
     "tsc-watch": "^6.2.0"
   }
