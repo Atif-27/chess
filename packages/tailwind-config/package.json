@@ -1,12 +1,12 @@
 {
   "name": "@chess/tailwind",
   "version": "0.0.0",
-  "main": "index.js",
-  "dependencies": {
-    "tailwindcss": "^3.4.11"
+  "private": true,
+  "exports": {
+    ".": "./tailwind.config.ts"
   },
-  "files": [
-    "postcss.config.js",
-    "tailwind.config.js"
-  ]
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "tailwindcss": "^3.4.17"
+  }
 }
