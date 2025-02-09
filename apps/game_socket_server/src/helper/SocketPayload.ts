@@ -1,5 +1,5 @@
-import { TgameMove } from "@chess/types/types";
-import { messages } from "@chess/types/messages";
+import { TgameMove } from "@chess/types/src/types";
+import { messages } from "@chess/types/src/messages";
 import Game from "../manager/game/Game";
 import { User } from "../manager/user/user";
 export function gameCreated({ gameId }: { gameId: string }) {

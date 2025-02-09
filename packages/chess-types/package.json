@@ -4,10 +4,8 @@
   "main": "messages.ts",
   "types": "index.d.ts",
   "dependencies": {
-    "chess.js": "^1.0.0-beta.8",
-    "@repo/typescript-config": "*"
+    "chess.js": "^1.0.0-beta.8"
   },
-  "scripts": {},
   "devDependencies": {
     "typescript": "^5.6.3"
   },
