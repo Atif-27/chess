@@ -7,11 +7,11 @@ import {
 } from "../../helper/SocketPayload";
 import { randomUUID } from "crypto";
 import { TgameMove } from "@chess/types/types";
-import prisma from "@chess/db/client";
+import { prisma } from "../../db/index";
 import { UserManager } from "../user/UserManager";
 import { User } from "../user/user";
 
-const userManager = UserManager.createUserManager();
+const userManager = UserManager.getInstance();
 
 export default class Game {
   public gameId: string;

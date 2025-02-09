@@ -7,21 +7,12 @@
     "chess.js": "^1.0.0-beta.8",
     "@repo/typescript-config": "*"
   },
-  "scripts": {
-    "dev": "tsc --watch",
-    "build": "tsc"
-  },
+  "scripts": {},
   "devDependencies": {
     "typescript": "^5.6.3"
   },
   "exports": {
-    "./messages": {
-      "types": "./src/messages.ts",
-      "default": "./dist/messages.js"
-    },
-    "./types": {
-      "types": "./src/types.d.ts",
-      "default": "./dist/types.d.ts"
-    }
+    "./messages": "./src/messages.ts",
+    "./types": "./src/types.d.ts"
   }
 }

@@ -1,18 +1,33 @@
-import crypto from "crypto";
 import { WebSocket } from "ws";
-import { userJwtClaims } from "../../auth";
 class User {
-  public socket: WebSocket;
-  public username: string;
   public userId: string;
-  public conId: string;
-  public isGuest?: boolean;
-  constructor(socket: WebSocket, jwtDecoded: userJwtClaims, isGuest: boolean) {
+  public username: string;
+  public socket: WebSocket;
+  public isGuest: boolean;
+  public rooms: Set<string>;
+
+  constructor(
+    socket: WebSocket,
+    userId: string,
+    username: string,
+    isGuest: boolean
+  ) {
     this.socket = socket;
-    this.conId = crypto.randomBytes(16).toString("hex");
-    this.userId = isGuest ? this.conId : jwtDecoded.userId;
-    this.username = isGuest ? `Guest${this.userId}` : jwtDecoded.username;
+    this.userId = userId;
+    this.username = username;
     this.isGuest = isGuest;
+    this.rooms = new Set();
+
+    this.setupEventListeners();
+  }
+
+  private setupEventListeners() {
+    this.socket.on("close", () => {
+      console.log(`User ${this.username} (${this.userId}) disconnected.`);
+    });
+    this.socket.on("error", (err) => {
+      console.error(`WebSocket error for ${this.username}:`, err);
+    });
   }
 }
 export { User };

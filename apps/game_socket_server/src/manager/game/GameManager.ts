@@ -6,71 +6,102 @@ import PrismaClient from "@chess/db/client";
 import { UserManager } from "../user/UserManager";
 import { User } from "../user/user";
 import { gameCreated } from "../../helper/SocketPayload";
-
-const userManager = UserManager.createUserManager();
+import jsonwebtoken from "jsonwebtoken";
+export interface UserJwtClaims {
+  userId: string;
+  username: string;
+}
 class GameManager {
   private games: Game[];
-  private users: User[];
-  private pendingUser: User | null;
+  private pendingUsers: Set<string>;
   private static instance: GameManager;
+  private userManager: UserManager;
+
   private constructor() {
     this.games = [];
-    this.users = [];
-    this.pendingUser = null;
+    this.pendingUsers = new Set();
+    this.userManager = UserManager.getInstance();
   }
-  static createGameManager(): GameManager {
+  static getInstance(): GameManager {
     if (!GameManager.instance) GameManager.instance = new GameManager();
     return GameManager.instance;
   }
-  addUser(user: User) {
-    userManager.updateUserSocket(user.userId, user.socket);
-    this.users.push(user);
-    this.addHandler(user);
-    console.log("User Added and Listening for Messages");
-  }
-  removeUser(socket: WebSocket) {
-    const user = this.users.find((user) => user.socket === socket);
-    if (!user) {
-      console.error("User not found?");
-      return;
+  public addUser(socket: WebSocket, jwt: string | null) {
+    let userClaims: UserJwtClaims | null = null;
+    if (jwt) {
+      try {
+        userClaims = jsonwebtoken.verify(
+          jwt,
+          process.env.JWT_SECRET!
+        ) as UserJwtClaims;
+      } catch (err) {
+        if (err instanceof Error) {
+          console.error(err.message);
+        }
+        socket.close();
+        return;
+      }
     }
-    this.users = this.users.filter((user) => user.socket !== socket);
-    // socketManager.removeUser(user);
-    //TODO Show game results as user disconnected
+
+    const isGuest = !jwt;
+    const userId = userClaims?.userId || `guest-${Date.now()}`;
+    const username = userClaims?.username || `Guest${Date.now()}`;
+
+    this.userManager.addUser(socket, userId, username, isGuest);
+    this.setupMessageHandler(socket, userId);
   }
-  addHandler(user: User) {
+
+  public removeUser(socket: WebSocket) {
+    const userId = Array.from(this.userManager.users.keys()).find(
+      (id) => this.userManager.users.get(id)?.socket === socket
+    );
+
+    if (!userId) return;
+    this.userManager.removeUser(userId);
+  }
+  setupMessageHandler(socket: WebSocket, userId: string) {
     //! Server is basically Listening for any message from client
-    user.socket.on("message", (data) => {
+    socket.on("message", (data) => {
       const message = JSON.parse(data.toString());
       if (message.type === messages.INIT_GAME) {
-        this.initGame(user);
+        this.initGame(userId);
       }
       if (message.type === messages.MAKE_MOVE) {
-        this.moveInGame(user, message.payload.move, message.payload.gameId);
+        this.moveInGame(userId, message.payload.move, message.payload.gameId);
       }
       if (message.type === messages.SHOW_GAME_CREATED) {
         this.createdGame(message.payload.gameId);
       }
     });
   }
-  initGame(user: User) {
+  initGame(userId: string) {
     //TODO: Check if user is already in a game
-    if (!this.pendingUser) {
-      this.pendingUser = user;
-    } else {
-      const pendingUser = this.pendingUser;
-      const newGame = new Game(pendingUser.userId, user.userId);
-      this.games.push(newGame);
-      this.pendingUser = null;
-      userManager.addUserToRoom([pendingUser, user], newGame.gameId);
-      userManager.broadcastMessage(
-        newGame.gameId,
-        gameCreated({ gameId: newGame.gameId })
-      );
+    if (this.pendingUsers.size === 0) {
+      this.pendingUsers.add(userId);
+      return;
     }
+
+    let opponentId = "";
+    for (let id of this.pendingUsers) {
+      if (id !== userId) {
+        opponentId = id;
+        break;
+      }
+    }
+    if (!opponentId) return; // Exit if no valid opponent is found
+    this.pendingUsers.delete(opponentId);
+    const newGame = new Game(userId, opponentId);
+    this.games.push(newGame);
+    this.userManager.addUserToRoom(userId, newGame.gameId);
+    this.userManager.addUserToRoom(opponentId, newGame.gameId);
+
+    this.userManager.broadcastMessage(
+      newGame.gameId,
+      gameCreated({ gameId: newGame.gameId })
+    );
   }
   createdGame(gameId: string) {
-    const users = userManager.getUsersInRoom(gameId);
+    const users = this.userManager.getUsersInRoom(gameId);
     const game = this.games.find((game) => game.gameId === gameId);
     if (!users || !game) {
       console.error("No users or game found");
@@ -78,9 +109,9 @@ class GameManager {
     }
     game?.showGameCreated(users);
   }
-  moveInGame(user: User, move: TgameMove, gameId: string) {
+  moveInGame(userId: string, move: TgameMove, gameId: string) {
     const game = this.games.find((game) => game.gameId === gameId);
-    game?.makeMove(user, move);
+    game?.makeMove(this.userManager.getUser(userId)!, move);
   }
 }
 

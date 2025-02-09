@@ -1,4 +1,3 @@
-import { Square } from "chess.js";
 import { TgameMove } from "@chess/types/types";
 import { messages } from "@chess/types/messages";
 import Game from "../manager/game/Game";
@@ -16,7 +15,7 @@ export function showCreatedGame({
   game,
   whitePlayer,
   blackPlayer,
-  currentFen
+  currentFen,
 }: {
   game: Game;
   whitePlayer: User;

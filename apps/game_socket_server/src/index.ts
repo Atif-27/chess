@@ -1,36 +1,38 @@
 import { WebSocketServer } from "ws";
 import GameManager from "./manager/game/GameManager";
-import { extractUserInfo } from "./auth";
+import { IncomingMessage } from "http";
 const wss = new WebSocketServer({ port: 8080 });
-const gameManager = GameManager.createGameManager();
+import dotenv from "dotenv";
+dotenv.config();
+
+const gameManager = GameManager.getInstance();
 
 console.log("WebSocket Server is listening to Port 8080");
 
-
-wss.on("connection", function connection(ws,req) {
+wss.on("connection", function connection(ws, req) {
   //! Extract User Info from Token
-  const cookie = req.headers.cookie;
-  const cookies = parseCookies(cookie as string);
-  const token = cookies.token;
-  console.log(token);
-  
-  const user = extractUserInfo(ws, token as string);
-
+  const cookies = parseCookies(req);
+  const jwt = cookies?.token;
   //! User Connected + Listening for Messages
-  gameManager.addUser(user);
+  gameManager.addUser(ws, jwt as string);
   //! User Disconnected
   ws.on("close", () => {
     console.log("User Disconnected");
-    gameManager.removeUser(ws);
+    // gameManager.removeUser(ws);
   });
 });
 
-function parseCookies(cookie: string) {
-  return cookie.split(";").reduce((acc, cookie) => {
-    const [key, value] = cookie.split("=");
-    if (key && value) {
-      acc[key.trim()] = value;
-    }
-    return acc;
-  }, {} as { [key: string]: string });
+function parseCookies(req: IncomingMessage) {
+  const cookie = req.headers.cookie;
+  if (!cookie) return {};
+  return cookie.split(";").reduce(
+    (acc, cookie) => {
+      const [key, value] = cookie.split("=");
+      if (key && value) {
+        acc[key.trim()] = value;
+      }
+      return acc;
+    },
+    {} as { [key: string]: string }
+  );
 }

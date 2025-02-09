@@ -1,15 +1,16 @@
 import express from 'express';
-import prisma from '@chess/db/client';
+import { prisma } from "./db/index";
 import bcrypt from 'bcrypt';
 import jsonwebtoken from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import cors from 'cors';
-
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
-const app=express();
+const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({extended:true}));
 app.use(cors({
     origin:process.env.FRONTEND_URL,
