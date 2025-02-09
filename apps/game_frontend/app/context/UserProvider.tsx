@@ -1,5 +1,5 @@
 "use client";
-import { createContext, use, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 type UserType = {
   username: string;
   id: string;
@@ -27,9 +27,9 @@ export default function UserProvider({
     localStorage.setItem("user", JSON.stringify(user));
   }
   useEffect(() => {
-    setUser(JSON.parse(localStorage.getItem("user") || "{}"));
-    
-    }, []);
+    const user = localStorage.getItem("user");
+    setUser(JSON.parse(user || "{}"));
+  }, []);
 
   return (
     <UserContext.Provider value={{ user, setUserCtx }}>

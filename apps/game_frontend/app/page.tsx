@@ -8,6 +8,11 @@ export default function Home() {
           Play Chess
         </Link>
       </button>
+      <button className="text-white bg-blue-800 p-3 rounded-2xl m-20">
+        <Link className="w-full h-full" href={"/login"}>
+          Login
+        </Link>
+      </button>
     </div>
   );
 }

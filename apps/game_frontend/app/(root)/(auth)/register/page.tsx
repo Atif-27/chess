@@ -5,35 +5,37 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const page = () => {
-  const [loginInput, setLoginInput] = React.useState({
+  const [registerInput, setRegisterInput] = React.useState({
     username: "",
+    name: "",
+    email: "",
     password: "",
   });
   const [error, setError] = useState<string>();
   const router = useRouter();
   const { setUserCtx } = useUserContext();
-  const handleLoginInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLoginInput({
-      ...loginInput,
+  const handleRegisterInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRegisterInput({
+      ...registerInput,
       [e.target.id]: e.target.value,
     });
   };
-  async function handleLogin() {
+  async function handleRegister() {
     try {
-      const response = await fetch("http://localhost:4000/api/v1/login", {
+      const response = await fetch("http://localhost:4000/api/v1/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(loginInput),
+        body: JSON.stringify(registerInput),
         credentials: "include",
       });
       if (!response.ok) {
-        throw new Error("Failed to login");
+        throw new Error("Failed to Register");
       }
       const data = await response.json();
       setUserCtx(data.user);
-      router.push("/");
+      router.push("/login");
     } catch (error) {
       if (error instanceof Error) {
         setError(error?.message);
@@ -42,16 +44,36 @@ const page = () => {
   }
   return (
     <div>
-      <h1>Login</h1>
+      <h1>Register</h1>
       <div>
+        <div>
+          <label htmlFor="username">Name</label>
+          <input
+            className="border-2 bg-white text-black m-2"
+            type="text"
+            id="name"
+            value={registerInput.name}
+            onChange={handleRegisterInput}
+          />
+        </div>
         <div>
           <label htmlFor="username">Username</label>
           <input
             className="border-2 bg-white text-black m-2"
             type="text"
             id="username"
-            value={loginInput.username}
-            onChange={handleLoginInput}
+            value={registerInput.username}
+            onChange={handleRegisterInput}
+          />
+        </div>
+        <div>
+          <label htmlFor="password">Email</label>
+          <input
+            className="border-2 bg-white text-black m-2"
+            type="email"
+            id="email"
+            value={registerInput.email}
+            onChange={handleRegisterInput}
           />
         </div>
         <div>
@@ -60,22 +82,22 @@ const page = () => {
             className="border-2 bg-white text-black m-2"
             type="password"
             id="password"
-            value={loginInput.password}
-            onChange={handleLoginInput}
+            value={registerInput.password}
+            onChange={handleRegisterInput}
           />
         </div>
       </div>
       <div>
-        Dont have an Account?{" "}
-        <Link className=" underline" href={"/register"}>
-          Register
+        Already have an Account?{" "}
+        <Link className=" underline" href={"/login"}>
+          Login
         </Link>
       </div>
       <button
         className=" p-2 m-2  w-full max-w-sm bg-blue-700 rounded-xl"
-        onClick={handleLogin}
+        onClick={handleRegister}
       >
-        Login
+        Register
       </button>
 
       {error && <div className="text-red-600">{error}</div>}
