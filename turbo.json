@@ -1,9 +1,9 @@
 {
   "globalEnv": [
     "**/.env.*local",
-    "WS_URL",
+    "NEXT_PUBLIC_WS_URL",
     "JWT_SECRET",
-    "BACKEND_URL",
+    "NEXT_PUBLIC_BACKEND_URL",
     "DATABASE_URL"
   ],
 

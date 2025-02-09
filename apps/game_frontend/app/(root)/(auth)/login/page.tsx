@@ -20,14 +20,17 @@ const page = () => {
   };
   async function handleLogin() {
     try {
-      const response = await fetch(process.env.BACKEND_URL + "/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(loginInput),
-        credentials: "include",
-      });
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_BACKEND_URL + "/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(loginInput),
+          credentials: "include",
+        }
+      );
       if (!response.ok) {
         throw new Error("Failed to login");
       }

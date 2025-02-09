@@ -22,14 +22,17 @@ const page = () => {
   };
   async function handleRegister() {
     try {
-      const response = await fetch(process.env.BACKEND_URL + "/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(registerInput),
-        credentials: "include",
-      });
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_BACKEND_URL + "/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(registerInput),
+          credentials: "include",
+        }
+      );
       if (!response.ok) {
         throw new Error("Failed to Register");
       }
