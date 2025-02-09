@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 
 export default function useSocket() {
   const [socket, setSocket] = useState<WebSocket | null>(null);
-  const WS_URL = "ws://localhost:8080";
+  const WS_URL = process.env.WS_URL;
   useEffect(() => {
-    const ws = new WebSocket(WS_URL);
+    const ws = new WebSocket(WS_URL!);
     ws.onopen = () => {
       console.log("Connected");
       setSocket(ws);

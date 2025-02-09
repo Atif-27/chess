@@ -1,4 +1,11 @@
 {
+  "globalEnv": [
+    "**/.env.*local",
+    "WS_URL",
+    "JWT_SECRET",
+    "BACKEND_URL",
+    "DATABASE_URL"
+  ],
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
   "tasks": {
