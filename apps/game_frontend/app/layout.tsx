@@ -1,19 +1,10 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
 import UserProvider from "./context/UserProvider";
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-});
 
 export const metadata: Metadata = {
-  title: "Chess | Play with Random People",
-  description: "Multiplayer Chess Game",
+  title: "Chess | Play Multiplayer",
+  description: "Play chess online with random people",
 };
 
 export default function RootLayout({
@@ -23,10 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body>
         <UserProvider>{children}</UserProvider>
       </body>
     </html>
   );
 }
-
