@@ -1,10 +1,8 @@
 import WebSocket from "ws";
 import Game from "./Game";
-import { TgameMove } from "@chess/types/types";
-import { messages } from "@chess/types/messages";
-import PrismaClient from "@chess/db/client";
+import { TgameMove } from "@chess/types/src/types";
+import { messages } from "@chess/types/src/messages";
 import { UserManager } from "../user/UserManager";
-import { User } from "../user/user";
 import { gameCreated } from "../../helper/SocketPayload";
 import jsonwebtoken from "jsonwebtoken";
 export interface UserJwtClaims {
