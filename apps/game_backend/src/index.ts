@@ -84,8 +84,6 @@ app.post('/api/v1/login',async (req,res)=>{
           maxAge: 30 * 24 * 60 * 60 * 1000, // Cookie expires after 30 days
           secure: true, // Cookie is sent only over HTTPS
           path: "/",
-          //@ts-ignore
-          sameSite: "None", // Allow cross-origin requests
         });
         res.status(200).json({
             message:'User logged in successfully',
