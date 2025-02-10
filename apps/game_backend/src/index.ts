@@ -7,64 +7,62 @@ import cors from 'cors';
 import cookieParser from "cookie-parser";
 
 dotenv.config();
-
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.urlencoded({extended:true}));
-app.use(cors({
-    origin:process.env.FRONTEND_URL,
-    credentials:true
-}));
-
-interface User{
-    id:string;
-    username:string;
-}
-
-app.post('/api/v1/register',async (req,res)=>{
-    let {username,name,email,password}=req.body;
-    password= bcrypt.hashSync(password,10);
-    try {
-        const ifExist=await prisma.user.findFirst({
-            where:{
-                OR:[
-                    {
-                        username
-                    },
-                    {
-                        email
-                    }
-                ]
-            }
-        });
-        if(ifExist){
-            throw new Error('User already exists');
-        }
-        const data=await prisma.user.create({
-            data:{
-                username,
-                name,
-                email,
-                password
-            }
-        })
-        res.cookie('token',generateToken(data),{
-            httpOnly:true,
-            secure:true
-        });
-        res.status(201).json({
-            message:'User created successfully',
-            data
-        });
-    } catch (error:any) {
-        res.status(500).json({
-            message:'Internal server error',
-            error:error.message
-        });
-    }
-}
+app.use(express.urlencoded({ extended: true }));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  })
 );
+
+interface User {
+  id: string;
+  username: string;
+}
+
+app.post("/api/v1/register", async (req, res) => {
+  let { username, name, email, password } = req.body;
+  password = bcrypt.hashSync(password, 10);
+  try {
+    const ifExist = await prisma.user.findFirst({
+      where: {
+        OR: [
+          {
+            username,
+          },
+          {
+            email,
+          },
+        ],
+      },
+    });
+    if (ifExist) {
+      throw new Error("User already exists");
+    }
+    const data = await prisma.user.create({
+      data: {
+        username,
+        name,
+        email,
+        password,
+      },
+    });
+
+    res.status(201).json({
+      message: "User created successfully",
+    });
+  } catch (error: any) {
+    console.log(error);
+
+    res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
 
 app.post('/api/v1/login',async (req,res)=>{
     let {username,password}=req.body;
