@@ -1,7 +1,7 @@
 import WebSocket from "ws";
 import Game from "./Game";
-import { TgameMove } from "@chess/types/src/types";
-import { messages } from "@chess/types/src/messages";
+import { TgameMove } from "@chess/types/types";
+import { messages } from "@chess/types/messages";
 import { UserManager } from "../user/UserManager";
 import { gameCreated } from "../../helper/SocketPayload";
 import jsonwebtoken from "jsonwebtoken";

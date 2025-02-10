@@ -1,5 +1,22 @@
 {
   "name": "@chess/types",
-  "version": "0.0.0",
-  "private": true
+  "version": "1.0.0",
+  "main": "messages.ts",
+  "types": "index.d.ts",
+  "dependencies": {
+    "chess.js": "^1.0.0-beta.8",
+    "@repo/typescript-config": "*"
+  },
+  "scripts": {},
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  },
+  "exports": {
+    "./messages": "./src/messages.ts",
+    "./types": {
+      "types": "./src/types.d.ts",
+      "import": "./src/types.js",
+      "require": "./src/types.js"
+    }
+  }
 }

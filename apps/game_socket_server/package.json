@@ -22,8 +22,8 @@
     "ws": "^8.18.0"
   },
   "devDependencies": {
-    "@types/dotenv": "^6.1.1",
     "@chess/types": "*",
+    "@types/dotenv": "^6.1.1",
     "@types/jsonwebtoken": "^9.0.8",
     "@types/node": "^22.13.1",
     "@types/ws": "^8.5.14",

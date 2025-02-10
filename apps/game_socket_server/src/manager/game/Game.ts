@@ -6,7 +6,7 @@ import {
   showMove,
 } from "../../helper/SocketPayload";
 import { randomUUID } from "crypto";
-import { TgameMove } from "@chess/types/src/types";
+import { TgameMove } from "@chess/types/types";
 import { prisma } from "../../db/index";
 import { UserManager } from "../user/UserManager";
 import { User } from "../user/user";

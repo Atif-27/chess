@@ -1,5 +1,3 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@chess/db/client";
 
-const client = new PrismaClient();
-
-export const prisma = client;
+export { prisma };
