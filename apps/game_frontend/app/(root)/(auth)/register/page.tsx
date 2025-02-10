@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useUserContext } from "../../../context/UserProvider";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import axiosInstance from "../../../helpers/AxiosInstance";
 
 const page = () => {
   const [registerInput, setRegisterInput] = React.useState({
@@ -22,22 +23,12 @@ const page = () => {
   };
   async function handleRegister() {
     try {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_BACKEND_URL + "/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(registerInput),
-          credentials: "include",
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to Register");
+      const res = await axiosInstance.post("/register", registerInput);
+
+      if (Number(res.status) > 400) {
+        throw new Error("Failed to login");
       }
-      const data = await response.json();
-      setUserCtx(data.user);
+
       router.push("/login");
     } catch (error) {
       if (error instanceof Error) {
