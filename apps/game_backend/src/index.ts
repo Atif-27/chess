@@ -68,28 +68,30 @@ app.post('/api/v1/login',async (req,res)=>{
     let {username,password}=req.body;
     
     try {
-        const user=await prisma.user.findFirst({
-            where:{
-                username
-            }
-        });
-        if(!user){
-            throw new Error('User not found');
-        }
-        if(!bcrypt.compareSync(password,user.password)){
-            throw new Error('Invalid password');
-        }
-        res.cookie("token", generateToken(user), {
-          httpOnly: true,
-          maxAge: 30 * 24 * 60 * 60 * 1000, // Cookie expires after 30 days
-          secure: true, // Cookie is sent only over HTTPS
-          path: "/",
-          sameSite: "none",
-        });
-        res.status(200).json({
-            message:'User logged in successfully',
-            user
-        });
+      const user = await prisma.user.findFirst({
+        where: {
+          username,
+        },
+      });
+      if (!user) {
+        throw new Error("User not found");
+      }
+      if (!bcrypt.compareSync(password, user.password)) {
+        throw new Error("Invalid password");
+      }
+      res.cookie("token", generateToken(user), {
+        httpOnly: true,
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        secure: true, // Ensures HTTPS in production
+        domain: ".builtbyatif.work", // Allows subdomain access
+        path: "/", // Makes cookie available on all routes
+        sameSite: "none", // Required for cross-site cookies
+      });
+
+      res.status(200).json({
+        message: "User logged in successfully",
+        user,
+      });
     } catch (error:any) {
         res.status(500).json({
             message:'Internal server error',
