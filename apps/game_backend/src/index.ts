@@ -79,9 +79,11 @@ app.post('/api/v1/login',async (req,res)=>{
         if(!bcrypt.compareSync(password,user.password)){
             throw new Error('Invalid password');
         }
-        res.cookie('token',generateToken(user),{
-            httpOnly:true,
-            secure:true
+        res.cookie("token", generateToken(user), {
+          httpOnly: true,
+          maxAge: 30 * 24 * 60 * 60 * 1000, // Cookie expires after 30 days
+          secure: true, // Cookie is sent only over HTTPS
+          sameSite: "none", // Allow cross-site requests
         });
         res.status(200).json({
             message:'User logged in successfully',
