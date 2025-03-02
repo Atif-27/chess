@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
  
 export function middleware(request: NextRequest) {
-    const encryptedToken = request.cookies.get("token")|| "";
-    //TODO VALIDATION OF TOKEN
+    const encryptedToken = request.cookies.get("token")?.value || "";
+    console.log(encryptedToken);
     if(!encryptedToken) return NextResponse.redirect(new URL('/login', request.url))
 }
  
