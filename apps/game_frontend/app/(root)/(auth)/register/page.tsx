@@ -4,6 +4,17 @@ import { useUserContext } from "../../../context/UserProvider";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axiosInstance from "../../../helpers/AxiosInstance";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const page = () => {
   const [registerInput, setRegisterInput] = React.useState({
@@ -26,7 +37,7 @@ const page = () => {
       const res = await axiosInstance.post("/register", registerInput);
 
       if (Number(res.status) > 400) {
-        throw new Error("Failed to login");
+        throw new Error("Failed to Register");
       }
 
       router.push("/login");
@@ -37,66 +48,80 @@ const page = () => {
     }
   }
   return (
-    <div>
-      <h1>Register</h1>
-      <div>
-        <div>
-          <label htmlFor="username">Name</label>
-          <input
-            className="border-2 bg-white text-black m-2"
-            type="text"
-            id="name"
-            value={registerInput.name}
-            onChange={handleRegisterInput}
-          />
-        </div>
-        <div>
-          <label htmlFor="username">Username</label>
-          <input
-            className="border-2 bg-white text-black m-2"
-            type="text"
-            id="username"
-            value={registerInput.username}
-            onChange={handleRegisterInput}
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Email</label>
-          <input
-            className="border-2 bg-white text-black m-2"
-            type="email"
-            id="email"
-            value={registerInput.email}
-            onChange={handleRegisterInput}
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Password</label>
-          <input
-            className="border-2 bg-white text-black m-2"
-            type="password"
-            id="password"
-            value={registerInput.password}
-            onChange={handleRegisterInput}
-          />
-        </div>
-      </div>
-      <div>
-        Already have an Account?{" "}
-        <Link className=" underline" href={"/login"}>
-          Login
-        </Link>
-      </div>
-      <button
-        className=" p-2 m-2  w-full max-w-sm bg-blue-700 rounded-xl"
-        onClick={handleRegister}
-      >
-        Register
-      </button>
-
-      {error && <div className="text-red-600">{error}</div>}
+    <div className={cn("flex flex-col gap-6 ")}>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl">Register</CardTitle>
+          <CardDescription>
+            Enter your email below to login to your account
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form>
+            <div className="flex flex-col gap-6">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  type="text"
+                  id="name"
+                  value={registerInput.name}
+                  onChange={handleRegisterInput}
+                  placeholder="Gavin Belson"
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  type="text"
+                  id="username"
+                  value={registerInput.username}
+                  onChange={handleRegisterInput}
+                  placeholder="gavinbelson"
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  type="email"
+                  id="email"
+                  value={registerInput.email}
+                  onChange={handleRegisterInput}
+                  placeholder="gavin@hooli.com"
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label htmlFor="password">Password</Label>
+                </div>
+                <Input
+                  placeholder="Your password"
+                  id="password"
+                  type="password"
+                  value={registerInput.password}
+                  onChange={handleRegisterInput}
+                  required
+                />
+              </div>
+              <Button type="button" className="w-full" onClick={handleRegister}>
+                Register
+              </Button>
+            </div>
+            <div className="mt-4 text-center text-sm">
+              Don&apos;t have an account?{" "}
+              <Link href="/login" className="underline underline-offset-4">
+                Sign up
+              </Link>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
 export default page;
+
+
