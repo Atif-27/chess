@@ -17,6 +17,7 @@
     username String @unique
     name String
     email String?
+    provider    AuthProvider? @default(EMAIL)
     rating Int @default(1200)
     password String
     createdAt DateTime @default(now())
