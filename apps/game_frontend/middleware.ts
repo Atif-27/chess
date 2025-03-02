@@ -3,8 +3,11 @@ import type { NextRequest } from 'next/server'
  
 export function middleware(request: NextRequest) {
     const encryptedToken = request.cookies.get("token")?.value || "";
-    console.log(encryptedToken);
-    if(!encryptedToken) return NextResponse.redirect(new URL('/login', request.url))
+    const redirectedResponse = NextResponse.redirect(
+      new URL("/login", request.url)
+    );
+    redirectedResponse.headers.set("x-middleware-cache", "no-cache");
+    if (!encryptedToken) return redirectedResponse;
 }
  
 // See "Matching Paths" below to learn more
