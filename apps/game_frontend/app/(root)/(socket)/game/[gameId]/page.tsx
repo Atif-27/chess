@@ -6,7 +6,29 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useSocketContext } from "../../../../context/SocketProvider";
 import { makeMove } from "../../../../helpers/SocketPayload";
 import { useUserContext } from "../../../../context/UserProvider";
-
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+  Clock,
+  MessageSquare,
+  Flag,
+  RotateCcw,
+  Users,
+  Settings,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
+import Link from "next/link";
 export default function Page({ params }: { params: { gameId: string } }) {
   const { socket } = useSocketContext();
   const [chess, setChess] = useState<Chess | null>(null);
@@ -21,7 +43,7 @@ export default function Page({ params }: { params: { gameId: string } }) {
     setChess(newChess);
     setBoard(newChess.board());
   }, []);
-
+  const [showMoves, setShowMoves] = useState(true);
   useEffect(() => {
     if (!socket) return;
     const handleMessage = (event: MessageEvent) => {
@@ -76,42 +98,225 @@ export default function Page({ params }: { params: { gameId: string } }) {
   console.log(user);
   const isWhite = gameData.whitePlayer.id === user?.id;
   const isBlack = gameData.blackPlayer.id === user?.id;
+  const userData = isWhite ? gameData?.whitePlayer : gameData?.blackPlayer;
+  const opponentData = !isWhite ? gameData?.whitePlayer : gameData?.blackPlayer;
+  if (!gameData) return;
+
   return (
-    <div className="relative">
-      {gameData && (
-        <div>
-          <div
-            className={`${isWhite ? "border border-green-400 text-green-400" : "text-white"}  p-2`}
-          >
-            White Player: {gameData?.whitePlayer?.name}
+    <div className="min-h-screen bg-gradient-to-b from-zinc-900 to-zinc-950 text-white">
+      {/* Game Header */}
+      <header className="container mx-auto px-4 py-3 flex items-center justify-between border-b border-zinc-800">
+        <div className="flex items-center gap-2">
+          <div className="bg-purple-600 p-1.5 rounded-lg">
+            <Clock className="h-4 w-4" />
           </div>
-          <div
-            className={`${isBlack ? "border border-green-400 text-green-400" : "text-white"}  p-2`}
+          <span className="font-bold text-sm md:text-base">
+            10:00 • Rapid Match
+          </span>
+        </div>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-zinc-400 hover:text-white"
           >
-            Black Player: {gameData?.blackPlayer?.name}
+            <Users className="h-4 w-4 mr-1" />
+            <span className="hidden sm:inline">Spectators</span>
+            <span className="inline sm:hidden">24</span>
+            <span className="hidden sm:inline">(24)</span>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-zinc-400 hover:text-white"
+          >
+            <Settings className="h-4 w-4" />
+            <span className="sr-only">Settings</span>
+          </Button>
+        </div>
+      </header>
+
+      <main className="container mx-auto px-4 py-4 md:py-6 lg:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Game Info - On mobile, this appears above the board */}
+          <div className="lg:order-1 order-2 lg:col-span-1">
+            {/* Player 2 (Top) */}
+            <div
+              className={`mb-4 p-4 rounded-lg ${true ? "bg-purple-900/30 border border-purple-500/50" : "bg-zinc-800/50 border border-zinc-700"}`}
+            >
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  {/* <Image
+                    src={player2.avatar || "/placeholder.svg"}
+                    alt={player2.name}
+                    width={48}
+                    height={48}
+                    className="rounded-full"
+                  /> */}
+                  <div
+                    className={`absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-zinc-900 ${true ? "bg-green-500" : "bg-zinc-500"}`}
+                  ></div>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-bold">{opponentData?.name}</h3>
+                    <span className="text-sm text-zinc-400">Rating: 1400</span>
+                  </div>
+                  <div className="flex items-center justify-between mt-1">
+                    <div className="flex">
+                      <div className="bg-white h-4 w-4 rounded-full mr-1"></div>
+                      <span className="text-sm">
+                        {isWhite ? "Black" : "White"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Move History - Collapsible on mobile */}
+            <div className="mb-4 bg-zinc-800/50 rounded-lg border border-zinc-700">
+              <div
+                className="p-3 flex items-center justify-between cursor-pointer"
+                onClick={() => setShowMoves(!showMoves)}
+              >
+                <h3 className="font-bold">Move History</h3>
+                <Button variant="ghost" size="sm" className="p-1 h-auto">
+                  {showMoves ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+
+              {/* {showMoves && (
+                <div className="p-3 pt-0 max-h-[300px] overflow-y-auto">
+                  <table className="w-full text-sm">
+                    <thead className="text-zinc-400 border-b border-zinc-700">
+                      <tr>
+                        <th className="py-2 text-left">#</th>
+                        <th className="py-2 text-left">White</th>
+                        <th className="py-2 text-left">Black</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Array.from({
+                        length: Math.ceil(moveHistory.length / 2),
+                      }).map((_, i) => (
+                        <tr
+                          key={i}
+                          className="border-b border-zinc-700/50 last:border-0"
+                        >
+                          <td className="py-2 text-zinc-500">{i + 1}.</td>
+                          <td className="py-2 font-mono">
+                            {moveHistory[i * 2]
+                              ? moveHistory[i * 2].notation
+                              : ""}
+                          </td>
+                          <td className="py-2 font-mono">
+                            {moveHistory[i * 2 + 1]
+                              ? moveHistory[i * 2 + 1].notation
+                              : ""}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )} */}
+            </div>
+            {/* Player 2 (Bottom) */}
+            <div
+              className={`mb-4 p-4 rounded-lg ${true ? "bg-purple-900/30 border border-purple-500/50" : "bg-zinc-800/50 border border-zinc-700"}`}
+            >
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  {/* <Image
+                    src={player2.avatar || "/placeholder.svg"}
+                    alt={player2.name}
+                    width={48}
+                    height={48}
+                    className="rounded-full"
+                  /> */}
+                  <div
+                    className={`absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-zinc-900 ${true ? "bg-green-500" : "bg-zinc-500"}`}
+                  ></div>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-bold">{userData?.name}</h3>
+                    <span className="text-sm text-zinc-400">Rating: 1400</span>
+                  </div>
+                  <div className="flex items-center justify-between mt-1">
+                    <div className="flex">
+                      <div className="bg-white h-4 w-4 rounded-full mr-1"></div>
+                      <span className="text-sm">
+                        {isBlack ? "Black" : "White"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Game Controls */}
+            <div className="bg-zinc-800/50 p-4 rounded-lg border border-zinc-700">
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  variant="outline"
+                  className="border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:text-white"
+                >
+                  <Flag className="h-4 w-4 mr-2" /> Resign
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:text-white"
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" /> Offer Draw
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:text-white col-span-2"
+                >
+                  <RotateCcw className="h-4 w-4 mr-2" /> Take Back Move
+                </Button>
+              </div>
+            </div>
           </div>
-          <div>
-            Game Started At: {new Date(gameData?.startTime).toLocaleString()}
+
+          {/* Chess Board - Center on desktop, top on mobile */}
+          <div className="lg:order-2 order-1 lg:col-span-2">
+            <div className="">
+              <ChessBoard
+                isBlack={isBlack}
+                board={board}
+                socket={socket}
+                gameData={gameData}
+                chess={chess!}
+              />
+            </div>
           </div>
         </div>
-      )}
-      <div>
-        <ChessBoard
-          isBlack={isBlack}
-          board={board}
-          socket={socket}
-          gameData={gameData}
-          chess={chess!}
-        />
-      </div>
+      </main>
       {result && (
-        <div className="absolute  w-full max-w-md  left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 p-10 bg-gray-300 border-black rounded-2xl text-black">
-          <h1 className="text-3xl text-center font-bold pb-10">Game Over</h1>
-          <h3> The winner is {result}</h3>
-          <button className="bg-blue-700 text-white p-2 mt-4 rounded-2xl">
-            Start Another game
-          </button>
-        </div>
+        <AlertDialog open={true}>
+          <AlertDialogContent className="bg-zinc-800 border-none">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="font-bold text-2xl">
+                Game Over
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-white">
+                The winner is {result}, We hope you enjoyed the game!
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <Link href={"/game"}>
+                <Button className="bg-purple-700 hover:bg-purple-800 text-white">
+                  Start Another game
+                </Button>
+              </Link>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       )}
     </div>
   );
@@ -159,7 +364,7 @@ function ChessBoard({
     : board;
 
   return (
-    <div className="mx-auto w-screen min-h-screen flex flex-col bg-grey-600 p-10">
+    <div className="max-w-[700px] mx-auto">
       {correctBoard?.map((row, rindex) => {
         return (
           <div key={rindex} className="flex">
@@ -192,7 +397,7 @@ function ChessBoard({
                     }));
                     setHighlightedSquares([]);
                   }}
-                  className={` w-20 h-20 flex justify-center border-black border-[0.1px] border-opacity-10 items-center font-bold ${
+                  className={` lg:w-20 lg:h-20 md:w-16 md:h-16 sm:w-14 sm:h-14 w-12 h-12  flex justify-center border-black border-[0.1px] border-opacity-10 items-center font-bold ${
                     (rindex + cindex) % 2 !== 0
                       ? " bg-[#7B61FF] "
                       : " bg-[#E8EDF9] "
@@ -213,6 +418,7 @@ function ChessBoard({
                       width={40}
                       height={40}
                       alt="icon"
+                      className="max-sm:scale-75"
                     />
                   )}
                 </div>
