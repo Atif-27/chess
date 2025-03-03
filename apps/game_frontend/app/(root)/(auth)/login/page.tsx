@@ -55,7 +55,7 @@ const page = () => {
     }
   }
   return (
-    <div className={cn("flex flex-col gap-6")}>
+    <div className={cn("flex flex-col gap-6 ")}>
       <Card className="overflow-hidden p-0 border-black ">
         <CardContent className="grid p-0 md:grid-cols-2 ">
           <form className="p-6 md:p-8">
@@ -96,7 +96,11 @@ const page = () => {
                   required
                 />
               </div>
-              <Button type="button" className="w-full" onClick={handleLogin}>
+              <Button
+                type="button"
+                className="w-full bg-purple-600 hover:bg-purple-700"
+                onClick={handleLogin}
+              >
                 Login
               </Button>
               <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
@@ -107,7 +111,8 @@ const page = () => {
               <div className="">
                 <Button
                   type="button"
-                  className="w-full bg-sky-900 hover:bg-sky-600 "
+                  variant="outline"
+                  className="w-full border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white "
                   onClick={handleGuestLogin}
                 >
                   Continue as Guest

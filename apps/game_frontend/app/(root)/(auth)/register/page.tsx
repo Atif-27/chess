@@ -105,7 +105,11 @@ const page = () => {
                   required
                 />
               </div>
-              <Button type="button" className="w-full" onClick={handleRegister}>
+              <Button
+                type="button"
+                className="w-full bg-purple-600 hover:bg-purple-700"
+                onClick={handleRegister}
+              >
                 Register
               </Button>
             </div>
