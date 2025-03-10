@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import toast from "react-hot-toast";
 
 const page = () => {
   const [registerInput, setRegisterInput] = React.useState({
@@ -33,19 +34,24 @@ const page = () => {
     });
   };
   async function handleRegister() {
-    try {
-      const res = await axiosInstance.post("/register", registerInput);
-
-      if (Number(res.status) > 400) {
-        throw new Error("Failed to Register");
-      }
-
-      router.push("/login");
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error?.message);
-      }
-    }
+    const res = axiosInstance.post("/register", registerInput);
+    toast.promise(res, {
+      loading: "Loading",
+      success: "Registered successfully, you can login now",
+      error: "Invalid entry",
+    });
+    res
+      .then((response) => {
+        if (response.status > 400) {
+          throw new Error("Failed to login");
+        }
+        router.push("/login");
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          setError(error.message);
+        }
+      });
   }
   return (
     <div className={cn("flex flex-col gap-6 ")}>

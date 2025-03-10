@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import toast from "react-hot-toast";
 
 const page = () => {
   const [loginInput, setLoginInput] = React.useState({
@@ -25,36 +26,46 @@ const page = () => {
     });
   };
   async function handleLogin() {
-    try {
-      const res = await axiosInstance.post("/login", loginInput);
-
-      if (Number(res.status) > 400) {
-        throw new Error("Failed to login");
-      }
-      setUserCtx(res.data.user);
-      router.push("/");
-      window.location.reload();
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error?.message);
-      }
-    }
+    const res = axiosInstance.post("/login", loginInput);
+    toast.promise(res, {
+      loading: "Loading",
+      success: "Success",
+      error: "Invalid credentials",
+    });
+    res
+      .then((response) => {
+        if (response.status > 400) {
+          throw new Error("Failed to login");
+        }
+        setUserCtx(response.data.user);
+        window.location.href = "/"; // Ensure cookies are sent
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          setError(error.message);
+        }
+      });
   }
   async function handleGuestLogin() {
-    try {
-      const res = await axiosInstance.post("/guest", loginInput);
-
-      if (Number(res.status) > 400) {
-        throw new Error("Failed to login");
-      }
-      setUserCtx(res.data.user);
-      router.push("/");
-      window.location.reload();
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error?.message);
-      }
-    }
+    const res = axiosInstance.post("/guest", loginInput);
+    toast.promise(res, {
+      loading: "Loading",
+      success: "Success",
+      error: "Invalid credentials",
+    });
+    res
+      .then((response) => {
+        if (response.status > 400) {
+          throw new Error("Failed to login");
+        }
+        setUserCtx(response.data.user);
+        window.location.href = "/"; // Ensure cookies are sent
+      })
+      .catch((error) => {
+        if (error instanceof Error) {
+          setError(error.message);
+        }
+      });
   }
   return (
     <div className={cn("flex flex-col gap-6 ")}>
