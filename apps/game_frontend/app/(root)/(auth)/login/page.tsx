@@ -33,6 +33,7 @@ const page = () => {
       }
       setUserCtx(res.data.user);
       router.push("/");
+      window.location.reload();
     } catch (error) {
       if (error instanceof Error) {
         setError(error?.message);
@@ -48,6 +49,7 @@ const page = () => {
       }
       setUserCtx(res.data.user);
       router.push("/");
+      window.location.reload();
     } catch (error) {
       if (error instanceof Error) {
         setError(error?.message);
